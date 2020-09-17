@@ -1,6 +1,6 @@
 # LogAnalyzer
 
-A text analyzing program to satisfy the NewRelic code challenge.
+A log analyzing program to satisfy the Datadog code challenge.
 
 ## Setup
 
