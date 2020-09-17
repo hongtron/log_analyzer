@@ -1,10 +1,10 @@
 require "fileutils"
 require "logger"
 
-require "text_analyzer/analyzer"
-require "text_analyzer/version"
+require "log_analyzer/analyzer"
+require "log_analyzer/version"
 
-module TextAnalyzer
+module LogAnalyzer
   LOGGER = Logger.new(STDOUT)
 
   class << self
@@ -16,8 +16,8 @@ module TextAnalyzer
   end
 end
 
-if TextAnalyzer.debug?
+if LogAnalyzer.debug?
   require "pry-byebug"
   Thread.abort_on_exception = true
-  TextAnalyzer::LOGGER.level = Logger::DEBUG
+  LogAnalyzer::LOGGER.level = Logger::DEBUG
 end

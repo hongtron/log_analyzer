@@ -1,4 +1,4 @@
-module TextAnalyzer
+module LogAnalyzer
   class Analyzer
     SEQUENCE_SIZE = 3
     RANK_CUTOFF = 100
@@ -25,7 +25,7 @@ module TextAnalyzer
     end
 
     def analyze(input)
-      TextAnalyzer::LOGGER.debug("Analyzing #{input == STDIN ? "STDIN" : input.path}")
+      LogAnalyzer::LOGGER.debug("Analyzing #{input == STDIN ? "STDIN" : input.path}")
       result = Hash.new(0)
       lookback_tokens = []
       input.each_line do |line|
@@ -39,7 +39,7 @@ module TextAnalyzer
     end
 
     def combine_results(results)
-      TextAnalyzer::LOGGER.debug("Combining #{results.length} sets of results")
+      LogAnalyzer::LOGGER.debug("Combining #{results.length} sets of results")
       results.reduce(Hash.new(0)) do |acc, result|
         acc.merge(result) { |seq, total_count, current_count| total_count + current_count }
       end

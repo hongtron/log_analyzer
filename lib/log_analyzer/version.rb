@@ -1,3 +1,3 @@
-module TextAnalyzer
+module LogAnalyzer
   VERSION = "0.1.0"
 end

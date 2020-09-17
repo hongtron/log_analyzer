@@ -1,5 +1,5 @@
 require "bundler/setup"
-require "text_analyzer"
+require "log_analyzer"
 require "pry-byebug"
 
 RSpec.configure do |config|

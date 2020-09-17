@@ -1,6 +1,6 @@
-RSpec.describe TextAnalyzer::Analyzer do
+RSpec.describe LogAnalyzer::Analyzer do
   let(:input) { "some_file.txt" }
-  let(:analyzer) { TextAnalyzer::Analyzer.new([input]) }
+  let(:analyzer) { LogAnalyzer::Analyzer.new([input]) }
   let(:file) { instance_double(File) }
 
   before(:each) do
@@ -10,8 +10,8 @@ RSpec.describe TextAnalyzer::Analyzer do
 
   describe "#run" do
     before(:each) do
-      stub_const("TextAnalyzer::Analyzer::SEQUENCE_SIZE", 3)
-      stub_const("TextAnalyzer::Analyzer::RANK_CUTOFF", 1)
+      stub_const("LogAnalyzer::Analyzer::SEQUENCE_SIZE", 3)
+      stub_const("LogAnalyzer::Analyzer::RANK_CUTOFF", 1)
       allow(file).to receive(:each_line)
         .and_yield("some! GREAT ..contents")
         .and_yield("(more) good werds")
@@ -22,7 +22,7 @@ RSpec.describe TextAnalyzer::Analyzer do
     it "analyzes STDIN without starting a new thread" do
       allow(STDIN).to receive(:each_line)
       expect(Thread).not_to receive(:new)
-      TextAnalyzer::Analyzer.new(STDIN).run
+      LogAnalyzer::Analyzer.new(STDIN).run
     end
 
     it "analyzes a single file input without starting a new thread" do
@@ -36,7 +36,7 @@ RSpec.describe TextAnalyzer::Analyzer do
     end
 
     context "with multiple input files" do
-      let(:multi_file_analyzer) { TextAnalyzer::Analyzer.new([input, input]) }
+      let(:multi_file_analyzer) { LogAnalyzer::Analyzer.new([input, input]) }
       let(:thread) { instance_double(Thread) }
 
       before(:each) do
@@ -53,41 +53,41 @@ RSpec.describe TextAnalyzer::Analyzer do
 
   describe "#analyze" do
     it "returns an empty result set if the input contains fewer than SEQUENCE_SIZE words" do
-      stub_const("TextAnalyzer::Analyzer::SEQUENCE_SIZE", 4)
+      stub_const("LogAnalyzer::Analyzer::SEQUENCE_SIZE", 4)
       allow(file).to receive(:each_line)
         .and_yield(generate_word)
         .and_yield(generate_word)
         .and_yield(generate_word)
-      analyzer = TextAnalyzer::Analyzer.new(input)
+      analyzer = LogAnalyzer::Analyzer.new(input)
       expect(analyzer.analyze(file).length).to eq(0)
     end
 
     it "detects sequences of SEQUENCE_SIZE words across multiple lines" do
-      stub_const("TextAnalyzer::Analyzer::SEQUENCE_SIZE", 4)
+      stub_const("LogAnalyzer::Analyzer::SEQUENCE_SIZE", 4)
       allow(file).to receive(:each_line)
         .and_yield(generate_word)
         .and_yield(generate_word)
         .and_yield(generate_word)
         .and_yield(generate_word)
-      analyzer = TextAnalyzer::Analyzer.new(input)
+      analyzer = LogAnalyzer::Analyzer.new(input)
       expect(analyzer.analyze(file).length).to eq(1)
     end
 
     it "detects sequences of SEQUENCE_SIZE words across empty lines" do
-      stub_const("TextAnalyzer::Analyzer::SEQUENCE_SIZE", 3)
+      stub_const("LogAnalyzer::Analyzer::SEQUENCE_SIZE", 3)
       allow(file).to receive(:each_line)
         .and_yield(generate_word)
         .and_yield("")
         .and_yield(generate_word)
         .and_yield(generate_word)
-      analyzer = TextAnalyzer::Analyzer.new(input)
+      analyzer = LogAnalyzer::Analyzer.new(input)
       expect(analyzer.analyze(file).length).to eq(1)
     end
   end
 
   describe "#get_most_common" do
     it "returns the top RANK_CUTOFF results keyed and ordered by count" do
-      stub_const("TextAnalyzer::Analyzer::RANK_CUTOFF", 3)
+      stub_const("LogAnalyzer::Analyzer::RANK_CUTOFF", 3)
 
       result = {
         ["we", "were", "both"] => 2,

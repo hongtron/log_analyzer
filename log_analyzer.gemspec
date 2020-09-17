@@ -1,8 +1,8 @@
-require_relative 'lib/text_analyzer/version'
+require_relative 'lib/log_analyzer/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "text_analyzer"
-  spec.version       = TextAnalyzer::VERSION
+  spec.name          = "log_analyzer"
+  spec.version       = LogAnalyzer::VERSION
   spec.authors       = ["ali hong"]
   spec.email         = ["hi@alihong.net"]
 
