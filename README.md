@@ -30,6 +30,13 @@ Our second criterion is to alert if the total traffic for the past 2 minutes
 ever exceeds a threshold. Basically we want to be regularly checking for the
 most recent 2 minutes, which sounds more like a rolling window than a bucket.
 
+It's nice to have an easy interface to access relevant information from log
+lines.  We could create a `Log` class that is initialized from a `CSV::Row`,
+but we are likely ingesting a large number of log lines and don't want to
+instantiate an object for each one (this would put a lot of work on the GC).
+Instead, `LogAnalyzer::LogParser` provides class methods that take a csv row
+and provide an interface to the various data we want.
+
 * metric point: 1 second resolution
 * bucket/rollup
 * Datadog tries to return about 150 points for any given time window.

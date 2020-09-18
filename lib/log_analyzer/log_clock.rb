@@ -7,7 +7,7 @@ module LogAnalyzer
     end
 
     def tick(log)
-      @current_time = [@current_time, log.time].max
+      @current_time = [@current_time, LogParser.time(log)].max
     end
   end
 end

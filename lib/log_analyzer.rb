@@ -4,6 +4,7 @@ require "logger"
 require "log_analyzer/analyzer"
 require "log_analyzer/bucket"
 require "log_analyzer/window"
+require "log_analyzer/log_parser"
 require "log_analyzer/version"
 
 module LogAnalyzer
