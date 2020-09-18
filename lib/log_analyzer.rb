@@ -2,6 +2,8 @@ require "fileutils"
 require "logger"
 
 require "log_analyzer/analyzer"
+require "log_analyzer/bucket"
+require "log_analyzer/window"
 require "log_analyzer/version"
 
 module LogAnalyzer
@@ -18,6 +20,5 @@ end
 
 if LogAnalyzer.debug?
   require "pry-byebug"
-  Thread.abort_on_exception = true
   LogAnalyzer::LOGGER.level = Logger::DEBUG
 end

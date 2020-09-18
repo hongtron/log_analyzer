@@ -1,71 +1,56 @@
 module LogAnalyzer
   class Analyzer
-    SEQUENCE_SIZE = 3
-    RANK_CUTOFF = 100
+    BUCKET_SPAN_SECONDS = 10
+    TRAFFIC_MONITORING_WINDOW_SECONDS = 120
+    DEFAULT_REQUESTS_PER_SEC_THRESHOLD = 10
 
     def initialize(input)
       @input = input
+      @output = STDOUT
+      @clock = Clock.new
+      @window = RollingWindow.new(@clock, TRAFFIC_MONITORING_WINDOW_SECONDS)
+      start_new_bucket
     end
 
     def run
       results = if @input == STDIN
         analyze(@input)
-      elsif @input.length == 1
-        analyze(File.new(@input.first))
       else
-        individual_results = @input.map { |path| File.new(path) }
-          .map { |file| Thread.new { Thread.current[:result] = analyze(file) } }
-          .each(&:join)
-          .map { |t| t[:result] }
-        combine_results(individual_results)
+        analyze(File.new(@input.first))
       end
+    end
 
-      top_results = get_most_common(results)
-      display(top_results)
+    def get_rows(input, options)
+      if input == STDIN
+        CSV(STDIN, **options) do |csv_in|
+          csv_in.each do |row|
+            yield row
+          end
+        end
+      else
+        CSV.foreach(input, **options) do |row|
+          yield row
+        end
+      end
     end
 
     def analyze(input)
       LogAnalyzer::LOGGER.debug("Analyzing #{input == STDIN ? "STDIN" : input.path}")
-      result = Hash.new(0)
-      lookback_tokens = []
-      input.each_line do |line|
-        normalize!(line)
-        tokens = lookback_tokens + line.split(" ")
-        sequences(tokens).each { |seq| result[seq] += 1 }
-        lookback_tokens = tokens.last(SEQUENCE_SIZE - 1)
-      end
+      current_time = 0
+      get_rows(input, headers: true) do |row|
+        @clock.tick(row)
+        @window.ingest(row)
 
-      result
-    end
-
-    def combine_results(results)
-      LogAnalyzer::LOGGER.debug("Combining #{results.length} sets of results")
-      results.reduce(Hash.new(0)) do |acc, result|
-        acc.merge(result) { |seq, total_count, current_count| total_count + current_count }
+        if @bucket.expired?
+          @output.puts(@bucket.summarize)
+          start_new_bucket
+        end
+        @bucket.ingest(row)
       end
     end
 
-    def normalize!(text)
-      text.downcase!
-      text.gsub!(/\s+/, ' ')
-      text.gsub!(/[^a-zA-Z0-9_ ]/,'')
-      text
-    end
-
-    def sequences(tokens)
-      tokens.each_cons(SEQUENCE_SIZE)
-    end
-
-    def get_most_common(result)
-      result.sort_by(&:last).reverse!.take(RANK_CUTOFF).compact.to_h.invert
-    end
-
-    def display(results)
-      output = results.map do |count, sequence|
-        "#{count} - #{sequence.join(" ")}"
-      end.join(", ")
-
-      STDOUT.puts(output)
+    def start_new_bucket
+      @bucket = Bucket.new(@clock, BUCKET_SPAN_SECONDS)
     end
   end
 end
