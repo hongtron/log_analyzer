@@ -4,8 +4,8 @@ module LogAnalyzer
       row.fetch("remotehost")
     end
 
-    def self.time(row)
-      Time.at(row.fetch("date"))
+    def self.epoch_time(row)
+      row.fetch("date")
     end
 
     def self.user(row)

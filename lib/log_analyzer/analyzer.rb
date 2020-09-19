@@ -8,7 +8,11 @@ module LogAnalyzer
       @input = input
       @output = STDOUT
       @clock = Clock.new
-      @window = RollingWindow.new(@clock, TRAFFIC_MONITORING_WINDOW_SECONDS)
+      @monitor = RollingWindowTrafficCheck.new(
+        @clock,
+        TRAFFIC_MONITORING_WINDOW_SECONDS,
+        DEFAULT_REQUESTS_PER_SEC_THRESHOLD,
+      )
       start_new_bucket
     end
 
@@ -39,10 +43,10 @@ module LogAnalyzer
       current_time = 0
       get_rows(input, headers: true) do |row|
         @clock.tick(row)
-        @window.ingest(row)
+        @monitor.record_hit_and_run_check!(output, LogParser.epoch_time(row))
 
         if @bucket.expired?
-          @output.puts(@bucket.summarize)
+          @bucket.summarize(@output)
           start_new_bucket
         end
         @bucket.ingest(row)

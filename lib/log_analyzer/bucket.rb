@@ -1,5 +1,7 @@
 module LogAnalyzer
   class Bucket
+    STAT_RANK_CUTOFF = 5
+
     def initialize(clock, span)
       @clock = clock
       @span = span
@@ -12,11 +14,29 @@ module LogAnalyzer
       @section_hits[LogParser.section(log)] += 1
     end
 
-    def summarize
+    def summarize(output)
+      output.puts <<~EOS
+        Most trafficked sections - #{most_trafficked_sections_summary}
+      EOS
     end
 
     def expired?
       @clock.current_time > @end_time
+    end
+
+    def most_trafficked_sections_summary
+      most_trafficked_sections.map do |hits, section|
+        "#{section} (hits: #{hits})"
+      end.join(", ")
+    end
+
+    def most_trafficked_sections
+      @section_hits
+        .invert
+        .sort_by(&:first)
+        .reverse
+        .take(STAT_RANK_CUTOFF)
+        .to_h
     end
   end
 end

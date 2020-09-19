@@ -37,6 +37,16 @@ instantiate an object for each one (this would put a lot of work on the GC).
 Instead, `LogAnalyzer::LogParser` provides class methods that take a csv row
 and provide an interface to the various data we want.
 
+Hit counts are stored as a time-ordered linked list to make it easy to roll
+expired hits (i.e. hits outside of the check window). Indexing new hits takes
+O(n) time, but this is considered acceptable because we traverse all hits in
+the window to determine traffic in the window anyways. For comparison, the
+other implementation that was considered was to index hits by timestamp in a
+Hash.  This would allow new hits to be indexed in constant time, but we would
+still have to traverse all keys in the hash to calculate the in-window traffic,
+leading to the same O(n) time complexity as the linked list approach.
+
+
 * metric point: 1 second resolution
 * bucket/rollup
 * Datadog tries to return about 150 points for any given time window.
