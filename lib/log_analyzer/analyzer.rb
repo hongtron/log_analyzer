@@ -16,7 +16,7 @@ module LogAnalyzer
       LogAnalyzer::LOGGER.debug("Analyzing #{@input == STDIN ? "STDIN" : @input}")
       current_time = 0
       _get_rows(headers: true) do |row|
-        @clock.tick(row)
+        @clock.tick(LogParser.epoch_time(row))
         @check.record_hit_and_perform_check!(@output, LogParser.epoch_time(row))
 
         if @bucket.expired?
