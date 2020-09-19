@@ -31,13 +31,15 @@ RSpec.describe LogAnalyzer::Analyzer do
     end
 
     context "when current bucket is expired" do
+      let(:new_bucket) { instance_double(LogAnalyzer::Bucket) }
       before(:each) do
         allow(analyzer.bucket).to receive(:expired?).and_return(true)
+        allow(new_bucket).to receive(:ingest)
+        allow(new_bucket).to receive(:start_time).and_return(0)
+        allow(new_bucket).to receive(:end_time).and_return(1)
       end
 
       it "starts a new bucket" do
-        new_bucket = instance_double(LogAnalyzer::Bucket)
-        allow(new_bucket).to receive(:ingest)
         expect(LogAnalyzer::Bucket).to receive(:new).and_return(new_bucket)
         expect(analyzer.bucket).not_to eq(new_bucket)
         analyzer.run

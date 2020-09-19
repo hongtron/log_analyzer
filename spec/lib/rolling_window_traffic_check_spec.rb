@@ -11,5 +11,7 @@ RSpec.describe LogAnalyzer::RollingWindowTrafficCheck do
     it "does not alert again if already triggered"
 
     it "recovers when traffic falls below threshold"
+
+    it "rolls metrics off the back of the window when they expire"
   end
 end

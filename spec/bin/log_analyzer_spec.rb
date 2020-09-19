@@ -1,6 +1,6 @@
 RSpec.describe "bin/log_analyzer" do
   it "accepts a file path argument" do
-    expect(%x[DEBUG=true bin/log_analyzer README.md]).to match("Analyzing README.md")
+    expect(%x[DEBUG=true bin/log_analyzer sample_csv.txt]).to match("Analyzing sample_csv.txt")
   end
 
   it "accepts input on stdin" do
