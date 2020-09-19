@@ -9,7 +9,6 @@ module LogAnalyzer
       @output = STDOUT
       @clock = LogClock.new
       @check = RollingWindowTrafficCheck.new(@clock, alert_threshold)
-      _start_new_bucket
     end
 
     def run
@@ -19,7 +18,9 @@ module LogAnalyzer
         @clock.tick(LogParser.epoch_time(row))
         @check.record_hit_and_perform_check!(@output, LogParser.epoch_time(row))
 
-        if bucket.expired?
+        if bucket.nil?
+          _start_new_bucket
+        elsif bucket.expired?
           bucket.summarize(@output)
           _start_new_bucket
         end

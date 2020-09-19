@@ -12,7 +12,7 @@ RSpec.describe LogAnalyzer::Analyzer do
 
   describe "#run" do
     before(:each) do
-      allow(STDOUT).to receive(:puts) # don't polute test output
+      allow(STDOUT).to receive(:puts) # don't pollute test output
     end
 
     it "advances the log clock" do
