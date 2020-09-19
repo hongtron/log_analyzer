@@ -2,6 +2,8 @@ module LogAnalyzer
   class Bucket
     STAT_RANK_CUTOFF = 5
 
+    attr_accessor :start_time, :end_time
+
     def initialize(clock, span)
       @clock = clock
       @span = span

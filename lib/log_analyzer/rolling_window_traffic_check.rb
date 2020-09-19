@@ -9,7 +9,7 @@ module LogAnalyzer
       @triggered = false
     end
 
-    def record_hit_and_run!(output, hit_time)
+    def record_hit_and_perform_check!(output, hit_time)
       roll_window!
 
       total_hits = 0
@@ -51,13 +51,17 @@ module LogAnalyzer
 
     def check!(output, total_hits)
       current_hit_rate = total_hits / WINDOW_SIZE
-      LogAnalyzer::LOGGER.debug("Current hit rate is #{current_hit_rate}")
-      if triggered? && current_hit_rate < @threshold
-        output.puts <<~EOS
-          Traffic returned to normal - hits = #{total_hits} (rate: #{current_hit_rate} requests/sec), recovered at #{Time.at(@clock.current_time)}
-        EOS
-        @triggered = false
-      elsif !triggered? && current_hit_rate >= @threshold
+      LogAnalyzer::LOGGER.debug("Current hit rate is #{current_hit_rate} requests/sec (trigger state: #{triggered?})")
+      if triggered?
+        if current_hit_rate < @threshold
+          output.puts <<~EOS
+            Traffic returned to normal - hits = #{total_hits} (rate: #{current_hit_rate} requests/sec), recovered at #{Time.at(@clock.current_time)}
+          EOS
+          @triggered = false
+        else
+          LogAnalyzer::LOGGER.debug("Elevated traffic - rate = #{current_hit_rate} requests/sec")
+        end
+      elsif current_hit_rate >= @threshold
         @triggered = true
         output.puts <<~EOS
           High traffic generated an alert - hits = #{total_hits} (rate: #{current_hit_rate} requests/sec), triggered at time #{Time.at(@clock.current_time)}

@@ -19,6 +19,10 @@ by setting the `ALERT_THRESHOLD` environment variable.
 
 `ALERT_THRESHOLD=20 bin/log_analyzer file.txt # sets threshold to 20 requests/sec`
 
+For additional output, run in debug mode by setting the `DEBUG` environment variable.
+
+`DEBUG=true bin/log_analyzer file.txt`
+
 ## Running tests
 
 `bundle exec rake`

@@ -17,7 +17,7 @@ module LogAnalyzer
       current_time = 0
       _get_rows(headers: true) do |row|
         @clock.tick(row)
-        @check.record_hit_and_run!(@output, LogParser.epoch_time(row))
+        @check.record_hit_and_perform_check!(@output, LogParser.epoch_time(row))
 
         if @bucket.expired?
           @bucket.summarize(@output)
@@ -42,8 +42,8 @@ module LogAnalyzer
     end
 
     def _start_new_bucket
-      LogAnalyzer::LOGGER.debug("Starting new metric bucket")
       @bucket = Bucket.new(@clock, BUCKET_SPAN_SECONDS)
+      LogAnalyzer::LOGGER.debug("Started new metric bucket for #{Time.at(@bucket.start_time)} to #{Time.at(@bucket.end_time)}")
     end
   end
 end

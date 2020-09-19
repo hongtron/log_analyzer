@@ -21,7 +21,7 @@ RSpec.describe LogAnalyzer::Analyzer do
     end
 
     it "runs the check" do
-      expect_any_instance_of(LogAnalyzer::RollingWindowTrafficCheck).to receive(:record_hit_and_run!)
+      expect_any_instance_of(LogAnalyzer::RollingWindowTrafficCheck).to receive(:record_hit_and_perform_check!)
       analyzer.run
     end
 
