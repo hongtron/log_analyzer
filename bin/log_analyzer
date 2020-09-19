@@ -8,14 +8,18 @@ unless ARGV.length <= 1 && ARGV.map { |f| File.exist?(f) }.all?
   Usage:
 
   This is a log-based utility for monitoring HTTP traffic.
+
   $ bin/log_analyzer file.txt
   $ cat file | bin/log_analyzer
   $ bin/log_analyzer # will wait for input on STDIN; input is terminated with ^D.
 
+  The default alert threshold is #{LogAnalyzer::DEFAULT_ALERT_THRESHOLD} requests per second.
+  This can be configured by setting the ALERT_THRESHOLD environment variable.
   EOS
 
   exit(1)
 end
 
 input = ARGV.any? ? ARGV.first : STDIN
-result = LogAnalyzer::Analyzer.new(input).run
+alert_threshold = ENV["ALERT_THRESHOLD"]&.to_i || LogAnalyzer::DEFAULT_ALERT_THRESHOLD
+result = LogAnalyzer::Analyzer.new(input, alert_threshold).run

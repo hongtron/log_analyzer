@@ -12,6 +12,7 @@ require "log_analyzer/version"
 
 module LogAnalyzer
   LOGGER = Logger.new(STDOUT)
+  DEFAULT_ALERT_THRESHOLD = 10 # requests/sec
 
   class << self
     LOGGER.level = Logger::WARN

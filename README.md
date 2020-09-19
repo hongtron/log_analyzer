@@ -14,6 +14,11 @@ Bundler is required. If it is not installed, `gem install bundler`.
 
 `cat file.txt | bin/log_analyzer`
 
+The default alerting threshold is 10 requests per second; this can be overridden
+by setting the `ALERT_THRESHOLD` environment variable.
+
+`ALERT_THRESHOLD=20 bin/log_analyzer file.txt # sets threshold to 20 requests/sec`
+
 ## Running tests
 
 `bundle exec rake`
@@ -46,6 +51,9 @@ Hash.  This would allow new hits to be indexed in constant time, but we would
 still have to traverse all keys in the hash to calculate the in-window traffic,
 leading to the same O(n) time complexity as the linked list approach.
 
+The window size is not specified to be configurable, so it is defined as a constant
+in `LogAnalyzer::RollingWindowTrafficCheck`. This could be easily modified to be
+configured via an environment variable (similar to the alert threshold).
 
 * metric point: 1 second resolution
 * bucket/rollup

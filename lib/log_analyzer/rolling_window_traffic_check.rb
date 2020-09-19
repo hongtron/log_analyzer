@@ -1,8 +1,9 @@
 module LogAnalyzer
   class RollingWindowTrafficCheck
-    def initialize(clock, window, threshold)
+    WINDOW_SIZE = 120 # seconds
+
+    def initialize(clock, threshold)
       @clock = clock
-      @window = window
       @threshold = threshold # requests/sec
       @hits = initial_data_point
       @triggered = false
@@ -30,7 +31,7 @@ module LogAnalyzer
     end
 
     def window_start
-      @clock.current_time - @window
+      @clock.current_time - WINDOW_SIZE
     end
 
     def roll_window!
@@ -47,7 +48,7 @@ module LogAnalyzer
     end
 
     def check!(output, total_hits)
-      current_hit_rate = total_hits / @window
+      current_hit_rate = total_hits / WINDOW_SIZE
       LogAnalyzer::LOGGER.debug("Current hit rate is #{current_hit_rate}")
       if triggered? && current_hit_rate < @threshold
         output.puts <<~EOS

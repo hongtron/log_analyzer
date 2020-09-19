@@ -1,18 +1,12 @@
 module LogAnalyzer
   class Analyzer
     BUCKET_SPAN_SECONDS = 10
-    TRAFFIC_MONITORING_WINDOW_SECONDS = 120
-    DEFAULT_REQUESTS_PER_SEC_THRESHOLD = 10
 
-    def initialize(input)
+    def initialize(input, alert_threshold)
       @input = input
       @output = STDOUT
       @clock = LogClock.new
-      @check = RollingWindowTrafficCheck.new(
-        @clock,
-        TRAFFIC_MONITORING_WINDOW_SECONDS,
-        DEFAULT_REQUESTS_PER_SEC_THRESHOLD,
-      )
+      @check = RollingWindowTrafficCheck.new(@clock, alert_threshold)
       _start_new_bucket
     end
 
