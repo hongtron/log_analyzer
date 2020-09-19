@@ -44,7 +44,9 @@ module LogAnalyzer
     end
 
     def initial_data_point
-      TimeseriesDataPoint.new(@clock.current_time)
+      current_time = @clock.current_time
+      LogAnalyzer::LOGGER.debug("Initializing new timeseries starting at #{current_time}")
+      TimeseriesDataPoint.new(current_time)
     end
 
     def check!(output, total_hits)

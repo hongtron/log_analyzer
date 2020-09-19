@@ -2,6 +2,8 @@ module LogAnalyzer
   class Analyzer
     BUCKET_SPAN_SECONDS = 10
 
+    attr_reader :bucket
+
     def initialize(input, alert_threshold)
       @input = input
       @output = STDOUT
@@ -40,6 +42,7 @@ module LogAnalyzer
     end
 
     def _start_new_bucket
+      LogAnalyzer::LOGGER.debug("Starting new metric bucket")
       @bucket = Bucket.new(@clock, BUCKET_SPAN_SECONDS)
     end
   end
