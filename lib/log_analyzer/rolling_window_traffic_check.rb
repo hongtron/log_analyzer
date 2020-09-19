@@ -2,6 +2,8 @@ module LogAnalyzer
   class RollingWindowTrafficCheck
     WINDOW_SIZE = 120 # seconds
 
+    attr_reader :hits
+
     def initialize(clock, threshold)
       @clock = clock
       @threshold = threshold # requests/sec
@@ -10,13 +12,16 @@ module LogAnalyzer
     end
 
     def record_hit_and_perform_check!(output, hit_time)
-      roll_window!
+      _roll_window!
+
+      raise "Invalid state; did you forget to tick the clock to #{hit_time}?" if hit_time > @clock.current_time
 
       total_hits = 0
       current_datapoint = @hits
       while current_datapoint do
         if current_datapoint.timestamp < hit_time
           if current_datapoint.next.nil? || current_datapoint.next.timestamp > hit_time
+            # insert a new datapoint that can be incremented on the next iteration
             current_datapoint.next = TimeseriesDataPoint.new(hit_time, next_point: current_datapoint.next)
           end
         elsif hit_time == current_datapoint.timestamp
@@ -27,14 +32,14 @@ module LogAnalyzer
         current_datapoint = current_datapoint.next
       end
 
-      check!(output, total_hits)
+      _check!(output, total_hits)
     end
 
     def window_start
       @clock.current_time - WINDOW_SIZE
     end
 
-    def roll_window!
+    def _roll_window!
       while @hits && @hits.timestamp < window_start
         @hits = @hits.next
       end
@@ -49,7 +54,7 @@ module LogAnalyzer
       TimeseriesDataPoint.new(current_time)
     end
 
-    def check!(output, total_hits)
+    def _check!(output, total_hits)
       current_hit_rate = total_hits / WINDOW_SIZE
       LogAnalyzer::LOGGER.debug("Current hit rate is #{current_hit_rate} requests/sec (trigger state: #{triggered?})")
       if triggered?

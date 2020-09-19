@@ -5,7 +5,7 @@ module LogAnalyzer
 
     def initialize(timestamp, next_point: nil)
       @timestamp = timestamp
-      @count = 1
+      @count = 0
       @next = next_point
     end
 
