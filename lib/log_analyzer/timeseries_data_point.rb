@@ -3,10 +3,10 @@ module LogAnalyzer
     attr_accessor :next
     attr_reader :timestamp, :count
 
-    def initialize(timestamp)
+    def initialize(timestamp, next_point: nil)
       @timestamp = timestamp
       @count = 1
-      @next = nil
+      @next = next_point
     end
 
     def increment_count

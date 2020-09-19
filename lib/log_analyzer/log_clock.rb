@@ -1,5 +1,5 @@
 module LogAnalyzer
-  class Clock
+  class LogClock
     attr_accessor :current_time
 
     def initialize
@@ -7,7 +7,7 @@ module LogAnalyzer
     end
 
     def tick(log)
-      @current_time = [@current_time, LogParser.time(log)].max
+      @current_time = [@current_time, LogParser.epoch_time(log)].max
     end
   end
 end

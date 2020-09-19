@@ -1,24 +1,29 @@
-module LogAnalzer
+module LogAnalyzer
   class RollingWindowTrafficCheck
     def initialize(clock, window, threshold)
       @clock = clock
       @window = window
       @threshold = threshold # requests/sec
-      @hits = TimeseriesDataPoint.new(@clock.current_time)
+      @hits = initial_data_point
       @triggered = false
     end
 
-    def record_hit_and_run_check!(output, hit_time)
+    def record_hit_and_run!(output, hit_time)
       roll_window!
 
       total_hits = 0
       current_datapoint = @hits
       while current_datapoint do
-        if hit_time == current_datapoint.timestamp
+        if current_datapoint.timestamp < hit_time
+          if current_datapoint.next.nil? || current_datapoint.next.timestamp > hit_time
+            current_datapoint.next = TimeseriesDataPoint.new(hit_time, next_point: current_datapoint.next)
+          end
+        elsif hit_time == current_datapoint.timestamp
           current_datapoint.increment_count
-          total_hits += current_datapoint.count
-          current_datapoint = current_datapoint.next
         end
+
+        total_hits += current_datapoint.count
+        current_datapoint = current_datapoint.next
       end
 
       check!(output, total_hits)
@@ -34,11 +39,16 @@ module LogAnalzer
       end
 
       # create a new timeseries head if everything has rolled out of the window
-      @hits ||= TimeseriesDataPoint.new(@clock.current_time)
+      @hits ||= initial_data_point
+    end
+
+    def initial_data_point
+      TimeseriesDataPoint.new(@clock.current_time)
     end
 
     def check!(output, total_hits)
       current_hit_rate = total_hits / @window
+      LogAnalyzer::LOGGER.debug("Current hit rate is #{current_hit_rate}")
       if triggered? && current_hit_rate < @threshold
         output.puts <<~EOS
           Traffic returned to normal - hits = #{total_hits}, recovered at time #{@clock.current_time}

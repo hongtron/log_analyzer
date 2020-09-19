@@ -5,7 +5,7 @@ module LogAnalyzer
     end
 
     def self.epoch_time(row)
-      row.fetch("date")
+      row.fetch("date").to_i
     end
 
     def self.user(row)
