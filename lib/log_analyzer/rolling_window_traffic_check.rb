@@ -54,16 +54,14 @@ module LogAnalyzer
       LogAnalyzer::LOGGER.debug("Current hit rate is #{current_hit_rate}")
       if triggered? && current_hit_rate < @threshold
         output.puts <<~EOS
-          Traffic returned to normal - hits = #{total_hits}, recovered at time #{@clock.current_time}
+          Traffic returned to normal - hits = #{total_hits}, recovered at #{Time.at(@clock.current_time)}
         EOS
         @triggered = false
       elsif !triggered? && current_hit_rate >= @threshold
         @triggered = true
         output.puts <<~EOS
-          High traffic generated an alert - hits = #{total_hits}, triggered at time #{@clock.current_time}
+          High traffic generated an alert - hits = #{total_hits}, triggered at time #{Time.at(@clock.current_time)}
         EOS
-      else
-        LogAnalyzer::LOGGER.debug("Alert status unchanged at time #{@clock.current_time}")
       end
     end
 

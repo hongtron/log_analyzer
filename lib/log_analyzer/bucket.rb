@@ -10,13 +10,13 @@ module LogAnalyzer
       @section_hits = Hash.new(0)
     end
 
-    def ingest(log)
-      @section_hits[LogParser.section(log)] += 1
+    def ingest(row)
+      @section_hits[LogParser.section(row)] += 1
     end
 
     def summarize(output)
       output.puts <<~EOS
-        Most trafficked sections - #{most_trafficked_sections_summary}
+        Top #{most_trafficked_sections.length} most trafficked sections for #{Time.at(@start_time)} to #{Time.at(@end_time)} - #{most_trafficked_sections_summary}
       EOS
     end
 
