@@ -1,8 +1,6 @@
 RSpec.describe "bin/log_analyzer" do
-  it "accepts arguments as a list of one or more file paths" do
-    out = %x[DEBUG=true bin/log_analyzer README.md SPECIFICATION.md]
-    expect(out).to match("Analyzing README.md")
-    expect(out).to match("Analyzing SPECIFICATION.md")
+  it "accepts a file path argument" do
+    expect(%x[DEBUG=true bin/log_analyzer README.md]).to match("Analyzing README.md")
   end
 
   it "accepts input on stdin" do
@@ -10,7 +8,7 @@ RSpec.describe "bin/log_analyzer" do
   end
 
   it "displays help text if passed args that are not filenames" do
-    expect(%x[bin/log_analyzer --textual-healing]).to match("Usage:")
+    expect(%x[bin/log_analyzer --cheese]).to match("Usage:")
     expect(%x[bin/log_analyzer fhqwhgads]).to match("Usage:")
   end
 end

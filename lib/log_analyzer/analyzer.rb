@@ -13,47 +13,39 @@ module LogAnalyzer
         TRAFFIC_MONITORING_WINDOW_SECONDS,
         DEFAULT_REQUESTS_PER_SEC_THRESHOLD,
       )
-      start_new_bucket
+      _start_new_bucket
     end
 
     def run
-      results = if @input == STDIN
-        analyze(@input)
-      else
-        analyze(File.new(@input.first))
-      end
-    end
-
-    def get_rows(input, options)
-      if input == STDIN
-        CSV(STDIN, **options) do |csv_in|
-          csv_in.each do |row|
-            yield row
-          end
-        end
-      else
-        CSV.foreach(input, **options) do |row|
-          yield row
-        end
-      end
-    end
-
-    def analyze(input)
-      LogAnalyzer::LOGGER.debug("Analyzing #{input == STDIN ? "STDIN" : input.path}")
+      LogAnalyzer::LOGGER.debug("Analyzing #{@input == STDIN ? "STDIN" : @input}")
       current_time = 0
-      get_rows(input, headers: true) do |row|
+      _get_rows(headers: true) do |row|
         @clock.tick(row)
         @check.record_hit_and_run!(@output, LogParser.epoch_time(row))
 
         if @bucket.expired?
           @bucket.summarize(@output)
-          start_new_bucket
+          _start_new_bucket
         end
         @bucket.ingest(row)
       end
     end
 
-    def start_new_bucket
+    def _get_rows(csv_options)
+      if @input == STDIN
+        CSV(STDIN, **csv_options) do |csv_in|
+          csv_in.each do |row|
+            yield row
+          end
+        end
+      else
+        CSV.foreach(@input, **csv_options) do |row|
+          yield row
+        end
+      end
+    end
+
+    def _start_new_bucket
       @bucket = Bucket.new(@clock, BUCKET_SPAN_SECONDS)
     end
   end

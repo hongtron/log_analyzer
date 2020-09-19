@@ -13,33 +13,3 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 end
-
-def token_chars
-  @token_chars ||= [('a'..'z'), ('A'..'Z'), (0..9)].map(&:to_a).flatten
-end
-
-def ignored_chars # not comprehensive
-  "\!\@\#\$\%\^\&\*\(\)\;\:\'".chars
-end
-
-def word_chars
-  @word_chars ||= token_chars + ignored_chars
-end
-
-def generate_token
-  (1..10).to_a.sample.times.map { |_| token_chars.sample }.join
-end
-
-def generate_word
-  word = ""
-  until (word.chars.to_set - ignored_chars.to_set).length > 0
-    word = (1..10).to_a.sample.times.map { |_| word_chars.sample }.join
-  end
-
-  word
-end
-
-def generate_line(length = nil)
-  length ||= (1..10).to_a.sample
-  length.times.map { |_| generate_token }.join(" ")
-end

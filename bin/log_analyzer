@@ -7,9 +7,7 @@ unless ARGV.length <= 1 && ARGV.map { |f| File.exist?(f) }.all?
   STDOUT.write <<~EOS
   Usage:
 
-  This is a utility to output a list of the 100 most common #{LogAnalyzer::Analyzer::SEQUENCE_SIZE}-word
-  sequences in one or more texts.
-
+  This is a log-based utility for monitoring HTTP traffic.
   $ bin/log_analyzer file.txt
   $ cat file | bin/log_analyzer
   $ bin/log_analyzer # will wait for input on STDIN; input is terminated with ^D.
@@ -19,5 +17,5 @@ unless ARGV.length <= 1 && ARGV.map { |f| File.exist?(f) }.all?
   exit(1)
 end
 
-input = ARGV.any? ? ARGV : STDIN
+input = ARGV.any? ? ARGV.first : STDIN
 result = LogAnalyzer::Analyzer.new(input).run
