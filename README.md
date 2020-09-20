@@ -61,6 +61,13 @@ configured via an environment variable (similar to the alert threshold).
 
 ## Areas for Improvement
 
+The `LogClock` is a useful abstraction for this problem, where alerting is
+based on log time and we have a constant stream of logs. However, this would
+not be a great approach for a real world application, as an interruption in the
+log stream would stall the clock. If we had a requirement to track
+conspicuously _low_ levels of traffic, this approach would need to be
+revisited.
+
 Currently, it can be cumbersome to establish state in tests (e.g. establishing
 a clock time). If developing this project further, I would definitely invest in
 adding factories and spec helpers to address this.
