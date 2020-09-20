@@ -14,8 +14,6 @@ module LogAnalyzer
     def record_hit_and_perform_check!(output, hit_time)
       _roll_window!
 
-      raise "Invalid state; did you forget to tick the clock to #{hit_time}?" if hit_time > @clock.current_time
-
       total_hits = 0
       current_datapoint = @hits
       while current_datapoint do
