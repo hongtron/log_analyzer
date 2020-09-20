@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["ali hong"]
   spec.email         = ["hi@alihong.net"]
 
-  spec.summary       = %q{Solution to NewRelic coding challenge.}
+  spec.summary       = %q{Solution to Datadog coding challenge.}
   spec.license       = "MIT"
   spec.required_ruby_version = Gem::Requirement.new(">= 2.3.0")
 

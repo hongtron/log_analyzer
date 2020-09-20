@@ -29,15 +29,15 @@ For additional output, run in debug mode by setting the `DEBUG` environment vari
 
 ## Design Decisions
 
-We have two different criteria for evaluating groups of log lines. The first is
-to check "every 10 seconds of log lines." Given that we are outputting
-statistics like traffic per section, we probably want to assess this in such a
-way that groupings of lines can be compared and aggregated. To me, this sounds
-like bucketing.
-
-Our second criterion is to alert if the total traffic for the past 2 minutes
-ever exceeds a threshold. Basically we want to be regularly checking for the
-most recent 2 minutes, which sounds more like a rolling window than a bucket.
+The `LogAnalyzer::Bucket` class exists so that we can calculate statistics for
+each 10 second period. At the same time, we have a separate
+`LogAnalyzer::RollingWindowTrafficCheck` class to check hit rates for the most
+recent 2 minutes. Both classes are concerned with tracking events through the
+log's timeline; they share an instance of `LogAnalyzer::LogClock` to do so. The
+log clock is a simple construct that essentially just keeps track of the most
+recent timestamp that has been seen in the logs. This becomes extremely
+valuable when considering the fact that log events are not necessarily in
+chronological order.
 
 It's nice to have an easy interface to access relevant information from log
 lines.  We could create a `Log` class that is initialized from a `CSV::Row`,
@@ -59,18 +59,12 @@ The window size is not specified to be configurable, so it is defined as a const
 in `LogAnalyzer::RollingWindowTrafficCheck`. This could be easily modified to be
 configured via an environment variable (similar to the alert threshold).
 
-* metric point: 1 second resolution
-* bucket/rollup
-* Datadog tries to return about 150 points for any given time window.
-* timestamps are not strictly increasing
+## Areas for Improvement
 
-* for every 10 seconds of log lines, display about the traffic during those 10s
-  * so, print once every 10 seconds
-  * sections of site with most hits
-* keep track of rolling total traffic on average
+Currently, it can be cumbersome to establish state in tests (e.g. establishing
+a clock time). If developing this project further, I would definitely invest in
+adding factories and spec helpers to address this.
 
+## Time Spent
 
-Figure out rolling window first, then tackle outputting.
-
-
-
+10-12 hours.
