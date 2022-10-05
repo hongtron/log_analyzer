@@ -1,6 +1,6 @@
 # LogAnalyzer
 
-A log analyzing program to satisfy the Datadog code challenge.
+A log analyzing program.
 
 ## Setup
 
